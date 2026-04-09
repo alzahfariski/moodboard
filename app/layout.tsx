@@ -17,6 +17,9 @@ const body = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Alzah & Effri — Engagement",
   description: "Sacred Garden Engagement Moodboard",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
