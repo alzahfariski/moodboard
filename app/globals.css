@@ -50,3 +50,12 @@ h1, h2, h3, h4, h5, h6 {
 img {
   @apply duration-500 ease-in-out;
 }
+
+@keyframes scroll-indicator {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+
+.animate-scroll-indicator {
+  animation: scroll-indicator 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}

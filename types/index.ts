@@ -16,6 +16,7 @@ export interface Photo {
   src: string;
   alt: string;
   tag: string;
+  category: string;
   span?: "normal" | "tall" | "wide";
 }
 
@@ -29,7 +30,6 @@ export interface Vendor {
 export interface TimelineEvent {
   time: string;
   event: string;
-  location: string;
   note?: string;
 }
 

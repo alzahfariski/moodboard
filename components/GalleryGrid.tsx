@@ -4,54 +4,61 @@ import { Photo } from "@/types";
 import Image from "next/image";
 import { useState } from "react";
 import Lightbox from "./Lightbox";
+import { motion } from "framer-motion";
+import AnimateOnScroll from "./AnimateOnScroll";
 
 interface GalleryGridProps {
   photos: Photo[];
+  allPhotos?: Photo[]; // Optional: if we want the lightbox to show all photos regardless of category
 }
 
-export default function GalleryGrid({ photos }: GalleryGridProps) {
+export default function GalleryGrid({ photos, allPhotos }: GalleryGridProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const handleClose = () => setSelectedIndex(null);
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-4 md:grid-rows-2 gap-3 md:gap-4 h-[900px] md:h-[600px]">
-        {photos.slice(0, 5).map((photo, index) => {
+      <div className="columns-2 lg:columns-3 gap-4 md:gap-8 space-y-4 md:space-y-8">
+        {photos.map((photo, index) => {
           const isTall = photo.span === "tall";
-          const placeholderClass = index % 2 === 0 ? "bg-taupe-100" : "bg-purple-200";
-
-          const gridClass = isTall 
-            ? "col-span-2 md:col-span-1 row-span-2 border border-taupe-100/50" 
-            : "col-span-1 row-span-1 border border-taupe-100/50";
-
+          const isWide = photo.span === "wide";
+          
           return (
-            <div
+            <AnimateOnScroll
               key={photo.src}
-              onClick={() => setSelectedIndex(index)}
-              className={`
-                relative rounded-2xl overflow-hidden group cursor-pointer
-                ${gridClass}
-                ${placeholderClass}
-                transition-all duration-500
-              `}
+              delay={index * 0.05}
+              y={20}
+              className="break-inside-avoid"
             >
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                className="object-cover transition-transform duration-1000 ease-out group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
-              
-              <div className="absolute inset-0 bg-taupe-800/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              <div className="absolute bottom-4 left-4 inline-flex items-center">
-                <span className="bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full text-[10px] md:text-xs font-semibold text-taupe-800 shadow-sm tracking-wide transform translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100">
-                  {photo.tag}
-                </span>
-              </div>
-            </div>
+              <motion.div
+                onClick={() => setSelectedIndex(index)}
+                className={`relative group cursor-pointer overflow-hidden rounded-2xl md:rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-700 bg-taupe-50 mb-4 md:mb-8 ${isWide ? 'md:col-span-2' : ''}`}
+                whileHover={{ y: -8, scale: 1.02 }}
+              >
+                {/* Use natural aspect ratio or slight constraint to keep it cohesive */}
+                <div className="relative w-full">
+                  <img
+                    src={photo.src}
+                    alt={photo.alt}
+                    loading={index < 4 ? "eager" : "lazy"}
+                    className="w-full h-auto object-contain transition-transform duration-1000 ease-out group-hover:scale-105"
+                  />
+                  
+                  {/* Subtle overlay on hover */}
+                  <div className="absolute inset-0 bg-taupe-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+                    <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                      <span className="text-white/60 text-[10px] uppercase tracking-[0.3em] font-body">
+                        {photo.tag}
+                      </span>
+                      <p className="text-white text-lg font-display italic">
+                        {photo.alt}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimateOnScroll>
           );
         })}
       </div>
