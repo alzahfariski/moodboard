@@ -4,7 +4,7 @@ export const moodboardData: MoodboardData = {
   couple: {
     name1: "Alzah",
     name2: "Effri",
-    date: "20 Mei 2026",
+    date: "25 Mei 2026",
     theme: "Sacred Garden",
     tagline: "A quiet evening, a forever promise.",
   },
@@ -26,7 +26,7 @@ export const moodboardData: MoodboardData = {
     "Candlelit",
   ],
   photos: [
-    // Couple Full Body (2 photos)
+    // Couple Full Body (5 photos)
     {
       src: "/photos/couple_full_body/1.png",
       alt: "Alzah & Effri - Full Body Portrait",
@@ -41,8 +41,29 @@ export const moodboardData: MoodboardData = {
       category: "Couple Full Body",
       span: "tall",
     },
+    {
+      src: "/photos/couple_full_body/3.png",
+      alt: "Alzah & Effri - Full Body III",
+      tag: "Main Portrait",
+      category: "Couple Full Body",
+      span: "tall",
+    },
+    {
+      src: "/photos/couple_full_body/4.png",
+      alt: "Alzah & Effri - Full Body IV",
+      tag: "Main Portrait",
+      category: "Couple Full Body",
+      span: "tall",
+    },
+    {
+      src: "/photos/couple_full_body/5.png",
+      alt: "Alzah & Effri - Full Body V",
+      tag: "Main Portrait",
+      category: "Couple Full Body",
+      span: "tall",
+    },
 
-    // Couple Half Body (8 photos)
+    // Couple Half Body (11 photos)
     {
       src: "/photos/couple_half_body/1.png",
       alt: "Alzah & Effri - Intimate Connection",
@@ -91,6 +112,24 @@ export const moodboardData: MoodboardData = {
       src: "/photos/couple_half_body/8.png",
       alt: "Timeless Bond",
       tag: "Portrait",
+      category: "Couple Half Body",
+    },
+    {
+      src: "/photos/couple_half_body/9.png",
+      alt: "Alzah & Effri - Half Body IX",
+      tag: "Half Body",
+      category: "Couple Half Body",
+    },
+    {
+      src: "/photos/couple_half_body/10.png",
+      alt: "Alzah & Effri - Half Body X",
+      tag: "Half Body",
+      category: "Couple Half Body",
+    },
+    {
+      src: "/photos/couple_half_body/11.png",
+      alt: "Alzah & Effri - Half Body XI",
+      tag: "Half Body",
       category: "Couple Half Body",
     },
 
@@ -212,6 +251,90 @@ export const moodboardData: MoodboardData = {
       tag: "Details",
       category: "Personal Shoot Boy",
       span: "tall",
+    },
+
+    // black & white (6 Photos)
+    {
+      src: "/photos/black_&_white/1.png",
+      alt: "Alzah & Effri - Black & White I",
+      tag: "Black & White",
+      category: "Black & White",
+      span: "tall",
+    },
+    {
+      src: "/photos/black_&_white/2.png",
+      alt: "Alzah & Effri - Black & White II",
+      tag: "Black & White",
+      category: "Black & White",
+    },
+    {
+      src: "/photos/black_&_white/3.png",
+      alt: "Alzah & Effri - Black & White III",
+      tag: "Black & White",
+      category: "Black & White",
+    },
+    {
+      src: "/photos/black_&_white/4.png",
+      alt: "Alzah & Effri - Black & White IV",
+      tag: "Black & White",
+      category: "Black & White",
+    },
+    {
+      src: "/photos/black_&_white/5.png",
+      alt: "Alzah & Effri - Black & White V",
+      tag: "Black & White",
+      category: "Black & White",
+    },
+    {
+      src: "/photos/black_&_white/6.png",
+      alt: "Alzah & Effri - Black & White VI",
+      tag: "Black & White",
+      category: "Black & White",
+    },
+
+    // details (7 photos)
+    {
+      src: "/photos/details/1.png",
+      alt: "Alzah & Effri - Details I",
+      tag: "Details",
+      category: "Details",
+      span: "tall",
+    },
+    {
+      src: "/photos/details/2.png",
+      alt: "Alzah & Effri - Details II",
+      tag: "Details",
+      category: "Details",
+    },
+    {
+      src: "/photos/details/3.png",
+      alt: "Alzah & Effri - Details III",
+      tag: "Details",
+      category: "Details",
+    },
+    {
+      src: "/photos/details/4.png",
+      alt: "Alzah & Effri - Details IV",
+      tag: "Details",
+      category: "Details",
+    },
+    {
+      src: "/photos/details/5.png",
+      alt: "Alzah & Effri - Details V",
+      tag: "Details",
+      category: "Details",
+    },
+    {
+      src: "/photos/details/6.png",
+      alt: "Alzah & Effri - Details VI",
+      tag: "Details",
+      category: "Details",
+    },
+    {
+      src: "/photos/details/7.png",
+      alt: "Alzah & Effri - Details VII",
+      tag: "Details",
+      category: "Details",
     },
   ],
   vendors: [
