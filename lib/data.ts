@@ -4,7 +4,7 @@ export const moodboardData: MoodboardData = {
   couple: {
     name1: "Alzah",
     name2: "Effri",
-    date: "25 Mei 2026",
+    date: "29 Mei 2026",
     theme: "Sacred Garden",
     tagline: "A quiet evening, a forever promise.",
   },
@@ -26,6 +26,19 @@ export const moodboardData: MoodboardData = {
     "Candlelit",
   ],
   photos: [
+    // decoration (2 photos)
+    {
+      src: "/decoration/1.png",
+      alt: "Decoration 1",
+      tag: "Decoration",
+      category: "Decoration",
+    },
+    {
+      src: "/decoration/2.png",
+      alt: "Decoration 2",
+      tag: "Decoration",
+      category: "Decoration",
+    },
     // Couple Full Body (5 photos)
     {
       src: "/photos/couple_full_body/1.png",
