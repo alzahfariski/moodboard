@@ -20,7 +20,7 @@ export default function PlanningContainer() {
   useEffect(() => {
     const savedItems = localStorage.getItem("seserahan_items");
     const savedCats = localStorage.getItem("seserahan_cats");
-    
+
     if (savedItems) setItems(JSON.parse(savedItems));
     else setItems(moodboardData.planning?.seserahan || []);
 
@@ -96,8 +96,8 @@ export default function PlanningContainer() {
     <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24">
       <header className="mb-10 pt-4 flex justify-between items-end">
         <div>
-          <h2 className="font-display text-4xl md:text-5xl text-taupe-800 mb-2">Power Planner</h2>
-          <p className="text-taupe-500 font-body text-sm md:text-base">Dashboard manajemen seserahan cerdas dan dinamis.</p>
+          <h2 className="font-display text-4xl md:text-5xl text-taupe-800 mb-2">Seserahan Planner</h2>
+          <p className="text-taupe-500 font-body text-sm md:text-base">Dashboard manajemen seserahan alfaefsa.</p>
         </div>
         <button onClick={openAddModal} className="hidden md:flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-2xl shadow-xl hover:bg-purple-700 transition-all font-bold">
           <Plus size={20} /> Tambah Item
@@ -107,18 +107,18 @@ export default function PlanningContainer() {
       {/* Main Dashboard Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         <div className="lg:col-span-2 space-y-8">
-           <SeserahanStats data={planningData} />
-           <div className="bg-white p-6 md:p-8 rounded-[32px] border border-taupe-100 shadow-sm">
-             <h3 className="font-display text-xl text-taupe-800 mb-6">Analisis Kategori</h3>
-             <CategoryBreakdown items={items} />
-           </div>
+          <SeserahanStats data={planningData} />
+          <div className="bg-white p-6 md:p-8 rounded-[32px] border border-taupe-100 shadow-sm">
+            <h3 className="font-display text-xl text-taupe-800 mb-6">Analisis Kategori</h3>
+            <CategoryBreakdown items={items} />
+          </div>
         </div>
         <div>
-          <CategoryManager 
-            categories={categories} 
-            onAdd={addCategory} 
-            onDelete={deleteCategory} 
-            onUpdate={updateCategory} 
+          <CategoryManager
+            categories={categories}
+            onAdd={addCategory}
+            onDelete={deleteCategory}
+            onUpdate={updateCategory}
           />
         </div>
       </div>
@@ -127,25 +127,25 @@ export default function PlanningContainer() {
         <h3 className="text-xl font-display text-taupe-800">Daftar Seserahan</h3>
         <span className="text-xs font-bold text-purple-600 bg-purple-50 px-3 py-1 rounded-full">{items.length} Items</span>
       </div>
-      
-      <SeserahanTable 
-        items={items} 
-        onDelete={deleteItem} 
-        onToggleStatus={toggleStatus} 
+
+      <SeserahanTable
+        items={items}
+        onDelete={deleteItem}
+        onToggleStatus={toggleStatus}
         onEditRequest={openEditModal}
       />
 
       {/* Mobile FAB */}
-      <button 
+      <button
         onClick={openAddModal}
         className="md:hidden fixed bottom-6 right-6 w-16 h-16 bg-purple-600 text-white rounded-full shadow-2xl z-[100] flex items-center justify-center active:scale-95 transition-transform"
       >
         <Plus size={32} />
       </button>
 
-      <MasterItemModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <MasterItemModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         onSave={handleSaveItem}
         categories={categories}
         initialData={activeItem}

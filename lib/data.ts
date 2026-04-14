@@ -371,6 +371,13 @@ export const moodboardData: MoodboardData = {
     { time: "20.00", event: "Makan bersama / ramah tamah" },
   ],
   planning: {
+    categories: [
+      { id: '1', name: 'Pakaian' },
+      { id: '2', name: 'Kosmetik' },
+      { id: '3', name: 'Perhiasan' },
+      { id: '4', name: 'Perlengkapan' },
+      { id: '5', name: 'Lainnya' },
+    ],
     seserahan: [
       {
         id: "1",
