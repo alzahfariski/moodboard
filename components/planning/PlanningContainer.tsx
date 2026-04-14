@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SeserahanItem, Category, PlanningData } from "@/types";
 import { moodboardData } from "@/lib/data";
 import SeserahanStats from "./SeserahanStats";
@@ -8,65 +8,171 @@ import SeserahanTable from "./SeserahanTable";
 import CategoryBreakdown from "./CategoryBreakdown";
 import MasterItemModal from "./MasterItemModal";
 import CategoryManager from "./CategoryManager";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCcw } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function PlanningContainer() {
   const [items, setItems] = useState<SeserahanItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeItem, setActiveItem] = useState<SeserahanItem | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Initialization
-  useEffect(() => {
-    const savedItems = localStorage.getItem("seserahan_items");
-    const savedCats = localStorage.getItem("seserahan_cats");
+  // Fetch data from Supabase
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Fetch Categories
+      const { data: catData, error: catError } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
 
-    if (savedItems) setItems(JSON.parse(savedItems));
-    else setItems(moodboardData.planning?.seserahan || []);
+      if (catError) throw catError;
 
-    if (savedCats) setCategories(JSON.parse(savedCats));
-    else setCategories([
-      { id: '1', name: 'Pakaian' },
-      { id: '2', name: 'Kosmetik' },
-      { id: '3', name: 'Perhiasan' },
-      { id: '4', name: 'Perlengkapan' }
-    ]);
+      // Fetch Items
+      const { data: itemData, error: itemError } = await supabase
+        .from('seserahan')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (itemError) throw itemError;
+
+      // Update state with DB data or fallback to local data if DB is empty
+      if (catData && catData.length > 0) {
+        setCategories(catData);
+      } else {
+        setCategories(moodboardData.planning?.categories || []);
+      }
+
+      if (itemData && itemData.length > 0) {
+        setItems(itemData as SeserahanItem[]);
+      } else {
+        setItems(moodboardData.planning?.seserahan || []);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Fallback to local data on error
+      setItems(moodboardData.planning?.seserahan || []);
+      setCategories(moodboardData.planning?.categories || []);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  // Sync
   useEffect(() => {
-    localStorage.setItem("seserahan_items", JSON.stringify(items));
-    localStorage.setItem("seserahan_cats", JSON.stringify(categories));
-  }, [items, categories]);
+    fetchData();
+  }, [fetchData]);
 
-  const handleSaveItem = (data: Partial<SeserahanItem>) => {
-    if (activeItem) {
-      // Edit
-      setItems(items.map(i => i.id === activeItem.id ? { ...i, ...data } as SeserahanItem : i));
-    } else {
-      // New
-      const newItem: SeserahanItem = {
-        id: crypto.randomUUID(),
-        category: data.category || "Lainnya",
-        detail: data.detail || "",
-        brand: data.brand || "",
-        status: "pending",
-        budget: data.budget || 0,
-        realization: data.realization || 0,
-        notes: data.notes || "",
-        link: data.link || "",
-      };
-      setItems([...items, newItem]);
+  // Sync / CRUD Operations
+  const handleSaveItem = async (data: Partial<SeserahanItem>) => {
+    try {
+      if (activeItem) {
+        // Edit in DB
+        const { error } = await supabase
+          .from('seserahan')
+          .update(data)
+          .eq('id', activeItem.id);
+
+        if (error) throw error;
+        setItems(items.map(i => i.id === activeItem.id ? { ...i, ...data } as SeserahanItem : i));
+      } else {
+        // New in DB
+        const newItem = {
+          category: data.category || "Lainnya",
+          detail: data.detail || "",
+          brand: data.brand || "",
+          status: "pending",
+          budget: data.budget || 0,
+          realization: data.realization || 0,
+          notes: data.notes || "",
+          link: data.link || "",
+        };
+
+        const { data: inserted, error } = await supabase
+          .from('seserahan')
+          .insert([newItem])
+          .select()
+          .single();
+
+        if (error) throw error;
+        if (inserted) setItems([...items, inserted as SeserahanItem]);
+      }
+      setIsModalOpen(false);
+      setActiveItem(null);
+    } catch (error) {
+      console.error("Error saving item:", error);
+      alert("Gagal menyimpan data ke Supabase");
     }
-    setActiveItem(null);
   };
 
-  const deleteItem = (id: string) => {
-    setItems(items.filter((item) => item.id !== id));
+  const deleteItem = async (id: string) => {
+    if (!confirm("Hapus item ini?")) return;
+    try {
+      const { error } = await supabase.from('seserahan').delete().eq('id', id);
+      if (error) throw error;
+      setItems(items.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
   };
 
-  const toggleStatus = (id: string) => {
-    setItems(items.map((i) => i.id === id ? { ...i, status: i.status === "done" ? "pending" : "done" } : i));
+  const toggleStatus = async (id: string) => {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    const newStatus = item.status === "done" ? "pending" : "done";
+
+    try {
+      const { error } = await supabase
+        .from('seserahan')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+      setItems(items.map((i) => i.id === id ? { ...i, status: newStatus } : i));
+    } catch (error) {
+      console.error("Error toggling status:", error);
+    }
+  };
+
+  // Category Logic
+  const addCategory = async (name: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert([{ name }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data) setCategories([...categories, data]);
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+  };
+
+  const deleteCategory = async (id: string) => {
+    try {
+      const { error } = await supabase.from('categories').delete().eq('id', id);
+      if (error) throw error;
+      setCategories(categories.filter(c => c.id !== id));
+    } catch (error) {
+      console.error("Error deleting category:", error);
+    }
+  };
+
+  const updateCategory = async (id: string, name: string) => {
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .update({ name })
+        .eq('id', id);
+
+      if (error) throw error;
+      setCategories(categories.map(c => c.id === id ? { ...c, name } : c));
+    } catch (error) {
+      console.error("Error updating category:", error);
+    }
   };
 
   const openAddModal = () => {
@@ -79,29 +185,35 @@ export default function PlanningContainer() {
     setIsModalOpen(true);
   };
 
-  // Category Logic
-  const addCategory = (name: string) => {
-    setCategories([...categories, { id: crypto.randomUUID(), name }]);
-  };
-  const deleteCategory = (id: string) => {
-    setCategories(categories.filter(c => c.id !== id));
-  };
-  const updateCategory = (id: string, name: string) => {
-    setCategories(categories.map(c => c.id === id ? { ...c, name } : c));
-  };
-
   const planningData: PlanningData = { seserahan: items, categories };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] text-taupe-400">
+        <RefreshCcw className="animate-spin mb-4" size={32} />
+        <p className="font-body">Memuat data dari cloud...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 pb-24">
       <header className="mb-10 pt-4 flex justify-between items-end">
         <div>
-          <h2 className="font-display text-4xl md:text-5xl text-taupe-800 mb-2">Seserahan Planner</h2>
-          <p className="text-taupe-500 font-body text-sm md:text-base">Dashboard manajemen seserahan alfaefsa.</p>
+          <div className="flex items-center gap-3 mb-2">
+            <h2 className="font-display text-4xl md:text-5xl text-taupe-800">Seserahan Planner</h2>
+
+          </div>
+          <p className="text-taupe-500 font-body text-sm md:text-base">Dashboard manajemen seserahan terpusat.</p>
         </div>
-        <button onClick={openAddModal} className="hidden md:flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-2xl shadow-xl hover:bg-purple-700 transition-all font-bold">
-          <Plus size={20} /> Tambah Item
-        </button>
+        <div className="flex gap-3">
+          <button onClick={fetchData} className="p-3 text-taupe-400 hover:text-purple-600 transition-colors">
+            <RefreshCcw size={20} />
+          </button>
+          <button onClick={openAddModal} className="hidden md:flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-2xl shadow-xl hover:bg-purple-700 transition-all font-bold">
+            <Plus size={20} /> Tambah Item
+          </button>
+        </div>
       </header>
 
       {/* Main Dashboard Grid */}
