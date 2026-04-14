@@ -2,33 +2,44 @@ import { PlanningData } from "@/types";
 import { formatCurrency } from "@/lib/utils";
 
 export default function SeserahanStats({ data }: { data: PlanningData }) {
-  const totalBudget = data.seserahan.reduce((acc, item) => acc + item.budget, 0);
-  const totalRealization = data.seserahan.reduce((acc, item) => acc + item.realization, 0);
-  const remainingBudget = totalBudget - totalRealization;
-  const progress = (totalRealization / totalBudget) * 100;
+  const { seserahan } = data;
+  
+  // LOGIKA:
+  // 1. Total Alokasi = Semua budget yang direncanakan
+  const totalBudget = seserahan.reduce((acc, item) => acc + (item.budget || 0), 0);
+  
+  // 2. Total Terbayar = Realisasi hanya untuk item yang 'done' (sudah dibeli)
+  const doneItems = seserahan.filter(i => i.status === 'done');
+  const totalSpent = doneItems.reduce((acc, item) => acc + (item.realization || 0), 0);
+  
+  // 3. Total Hemat = (Budget - Realisasi) khusus item yang 'done'
+  const totalSavings = doneItems.reduce((acc, item) => {
+    const saving = (item.budget || 0) - (item.realization || 0);
+    return acc + (saving > 0 ? saving : 0);
+  }, 0);
+
+  // 4. Sisa Budget Pending = Budget untuk item yang belum dibeli (status pending)
+  const pendingItems = seserahan.filter(i => i.status === 'pending');
+  const remainingBudget = pendingItems.reduce((acc, item) => acc + (item.budget || 0), 0);
+
+  const stats = [
+    { label: "Total Alokasi", value: totalBudget, color: "text-taupe-800", sub: `${seserahan.length} Items` },
+    { label: "Total Terbayar", value: totalSpent, color: "text-purple-600", sub: `Sudah beli ${doneItems.length}` },
+    { label: "Total Hemat", value: totalSavings, color: "text-green-600", sub: "Selisih Budget" },
+    { label: "Sisa Budget", value: remainingBudget, color: "text-taupe-400", sub: `${pendingItems.length} Pending` },
+  ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div className="bg-white p-6 rounded-3xl border border-taupe-100 shadow-sm">
-        <p className="text-taupe-600 text-sm mb-1 font-body">Total Budget</p>
-        <h3 className="text-3xl font-display text-taupe-800">{formatCurrency(totalBudget)}</h3>
-      </div>
-      
-      <div className="bg-purple-50 p-6 rounded-3xl border border-purple-100 shadow-sm">
-        <p className="text-purple-600 text-sm mb-1 font-body">Total Realization</p>
-        <h3 className="text-3xl font-display text-purple-800">{formatCurrency(totalRealization)}</h3>
-        <div className="mt-4 w-full bg-purple-200 h-1.5 rounded-full overflow-hidden">
-          <div 
-            className="bg-purple-600 h-full transition-all duration-1000" 
-            style={{ width: `${progress}%` }}
-          />
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {stats.map((stat, i) => (
+        <div key={i} className="bg-white p-5 rounded-[24px] border border-taupe-100 shadow-sm flex flex-col justify-between">
+          <p className="text-[10px] uppercase font-bold tracking-widest text-taupe-400 mb-3">{stat.label}</p>
+          <div>
+            <h4 className={`text-lg md:text-xl font-body font-bold ${stat.color}`}>{formatCurrency(stat.value)}</h4>
+            <p className="text-[10px] text-taupe-400 mt-1 font-medium italic">{stat.sub}</p>
+          </div>
         </div>
-      </div>
-
-      <div className="bg-white p-6 rounded-3xl border border-taupe-100 shadow-sm">
-        <p className="text-taupe-600 text-sm mb-1 font-body">Remaining</p>
-        <h3 className="text-3xl font-display text-taupe-800">{formatCurrency(remainingBudget)}</h3>
-      </div>
+      ))}
     </div>
   );
 }

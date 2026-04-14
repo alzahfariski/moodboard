@@ -115,13 +115,14 @@ export default function MasterItemModal({ isOpen, onClose, onSave, categories, i
                 </div>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-xs font-bold text-taupe-400 uppercase tracking-wider ml-1">
-                    <Save size={12} /> Realisasi (Rp)
+                    <Save size={12} /> Harga Beli Final / Realisasi (Rp)
                   </label>
                   <input
                     type="number"
                     value={formData.realization || ""}
                     onChange={(e) => setFormData({ ...formData, realization: Number(e.target.value) })}
                     className="w-full bg-taupe-50 border-0 rounded-2xl p-4 text-purple-700 font-bold outline-none"
+                    placeholder="0"
                   />
                 </div>
               </div>
