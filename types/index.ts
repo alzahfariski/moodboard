@@ -33,6 +33,28 @@ export interface TimelineEvent {
   note?: string;
 }
 
+export interface SeserahanItem {
+  id: string;
+  category: string;
+  detail: string;
+  status: "done" | "pending";
+  brand: string;
+  budget: number;
+  realization: number;
+  notes?: string;
+  link?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+}
+
+export interface PlanningData {
+  seserahan: SeserahanItem[];
+  categories: Category[];
+}
+
 export interface MoodboardData {
   couple: CoupleInfo;
   palette: ColorSwatch[];
@@ -40,4 +62,5 @@ export interface MoodboardData {
   photos: Photo[];
   vendors: Vendor[];
   timeline: TimelineEvent[];
+  planning?: PlanningData;
 }
